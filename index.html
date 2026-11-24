@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS Algorithm & System Visualizer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>CS Visualizer</h1>
+  <span class="tag">100% offline · step-by-step</span>
+  <span class="spacer"></span>
+  <button id="btn-settings" class="btn">⚙ AI Settings</button>
+</header>
+
+<main class="layout">
+  <!-- LEFT: topic selector + custom input -->
+  <aside id="left" class="panel">
+    <h2>Topics</h2>
+    <input id="topic-filter" type="text" placeholder="Search topics…">
+    <nav id="topics"></nav>
+    <h2>Custom Input</h2>
+    <form id="input-form" autocomplete="off"></form>
+  </aside>
+
+  <!-- CENTER: canvas, controls, pseudocode, state -->
+  <section id="center">
+    <div class="panel title-row">
+      <div>
+        <h2 id="viz-title">Select a topic</h2>
+        <p id="viz-blurb" class="muted"></p>
+      </div>
+    </div>
+    <div id="canvas" class="panel canvas"></div>
+
+    <div class="panel controls">
+      <button id="btn-reset" class="btn" title="Reset (Home)">⏮</button>
+      <button id="btn-back" class="btn" title="Step back (←)">◀ Step</button>
+      <button id="btn-play" class="btn primary" title="Play / Pause (Space)">▶ Play</button>
+      <button id="btn-fwd" class="btn" title="Step forward (→)">Step ▶</button>
+      <label class="speed">Speed
+        <input id="speed" type="range" min="1" max="10" value="5">
+        <span id="speed-val">5</span>
+      </label>
+      <input id="scrub" type="range" min="0" max="0" value="0" title="Scrub through steps">
+      <span id="step-count" class="muted">0 / 0</span>
+    </div>
+
+    <div class="panel step-msg">
+      <div id="step-msg">—</div>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <h2>Pseudocode</h2>
+        <ol id="pseudo" class="pseudo"></ol>
+      </div>
+      <div class="panel">
+        <h2>State Inspector</h2>
+        <table id="inspector" class="inspector"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: AI tutor -->
+  <aside id="right" class="panel">
+    <h2>AI Tutor &amp; Viva Quiz <span id="ai-mode" class="badge">offline</span></h2>
+    <div class="ai-buttons">
+      <button id="btn-explain" class="btn primary">💡 Explain Current Step</button>
+      <button id="btn-predict" class="btn">🎯 Predict Next Step Quiz</button>
+      <button id="btn-viva" class="btn">🎓 Viva Question</button>
+    </div>
+    <div id="quiz-box" class="quiz-box" hidden>
+      <div id="quiz-q"></div>
+      <textarea id="quiz-answer" rows="2" placeholder="Type your answer…"></textarea>
+      <div class="row">
+        <button id="quiz-submit" class="btn primary">Submit answer</button>
+        <button id="quiz-reveal" class="btn">Reveal</button>
+      </div>
+    </div>
+    <div id="chat" class="chat"></div>
+    <form id="ask-form" class="ask">
+      <input id="ask-input" type="text" placeholder="Ask about this step…">
+      <button class="btn">Ask</button>
+    </form>
+  </aside>
+</main>
+
+<dialog id="settings">
+  <form method="dialog" id="settings-form">
+    <h2>AI Tutor Settings</h2>
+    <label>Mode
+      <select id="set-provider">
+        <option value="offline">Rule-based offline (no key, no LLM)</option>
+        <option value="gemini">Google Gemini (free-tier API key)</option>
+        <option value="ollama">Local Ollama (100% offline LLM)</option>
+      </select>
+    </label>
+
+    <fieldset id="fs-gemini">
+      <legend>Gemini</legend>
+      <label>API key <input id="set-key" type="password" placeholder="Paste key (kept in this browser's localStorage)"></label>
+      <label>Model
+        <select id="set-gmodel">
+          <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (default, high free quota)</option>
+          <option value="gemini-3.8-flash">gemini-3.8-flash (deeper reasoning)</option>
+        </select>
+      </label>
+      <label>Custom model id (optional override) <input id="set-gcustom" type="text" placeholder="e.g. gemini-2.5-flash"></label>
+    </fieldset>
+
+    <fieldset id="fs-ollama">
+      <legend>Ollama</legend>
+      <label>Endpoint <input id="set-ourl" type="text" value="http://localhost:11434/api/generate"></label>
+      <label>Model
+        <select id="set-omodel">
+          <option value="gemma4">gemma4</option>
+          <option value="llama3.2">llama3.2</option>
+        </select>
+      </label>
+      <label>Custom model id (optional override) <input id="set-ocustom" type="text" placeholder="e.g. qwen2.5:7b"></label>
+      <p class="muted small">Opened from file://? Start Ollama with <code>OLLAMA_ORIGINS=*</code> so the browser may call it.</p>
+    </fieldset>
+
+    <p class="muted small">If a model call fails, the tutor automatically falls back to the rule-based explainer.</p>
+    <div class="row">
+      <button value="save" id="set-save" class="btn primary">Save</button>
+      <button value="cancel" class="btn">Close</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="core.js"></script>
+<script src="dsa-common.js"></script>
+<script src="dsa.js"></script>
+<script src="dsa-sort.js"></script>
+<script src="dsa-linear.js"></script>
+<script src="dsa-tree.js"></script>
+<script src="dsa-graph.js"></script>
+<script src="dsa-paradigm.js"></script>
+<script src="dsa-string.js"></script>
+<script src="os.js"></script>
+<script src="networks.js"></script>
+<script src="ai-tutor.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# Preview helpers and other projects live elsewhere
+.claude/
+portfolio/
+portfolio-editorial/
+*.docx
+node_modules/
+.DS_Store
+Thumbs.db
